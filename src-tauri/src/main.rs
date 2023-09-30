@@ -120,3 +120,20 @@ fn main() {
         .run(context)
         .expect("error while running tauri application");
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::sudoku::board::Board;
+
+    #[test]
+    fn test_generate() {
+        for i in 0..5 {
+            println!("ROUND: {}", i);
+            let mut board = Board::new(3);
+            board.generate();
+            let correct = board.is_correct_all();
+            println!("ROUND PASS: {}", correct);
+            assert_eq!(correct, true)
+        }
+    }
+}

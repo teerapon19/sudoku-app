@@ -2,9 +2,11 @@
 import { ref } from "vue";
 import { invoke } from "@tauri-apps/api/tauri";
 import router from "../router";
+import LoadingOverlay from "../components/LoadingOverlay.vue";
 
 const boardSize = ref();
 const difficulty = ref();
+const isLoading = ref(false);
 
 let selectedlevel = 3;
 let selectedDifficulty = 40;
@@ -29,13 +31,18 @@ const selectDifficulty = (event: Event, level: number) => {
   selectedDifficulty = level;
 };
 
-const start = async () => {
-  await invoke("generate_board", {
-    level: selectedlevel,
-    difficultyPercentage: selectedDifficulty,
-  });
+const start = () => {
+  isLoading.value = true;
+  setTimeout(async () => {
+    await invoke("generate_board", {
+      level: selectedlevel,
+      difficultyPercentage: selectedDifficulty,
+    });
 
-  router.push({ path: "/game" });
+    setTimeout(() => {
+      router.push({ path: "/game" });
+    }, 1000);
+  }, 100);
 };
 </script>
 
@@ -98,5 +105,6 @@ const start = async () => {
         </button>
       </div>
     </div>
+    <LoadingOverlay :show="isLoading" />
   </div>
 </template>

@@ -1,5 +1,5 @@
 use crate::sudoku::sun::*;
-use rand::Rng;
+use rand::{seq::SliceRandom, Rng};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -48,27 +48,32 @@ impl Board {
     }
 
     pub fn generate(&mut self) {
-        let expect_sum = self.size * (self.size + 1) / 2;
         let mut rng = rand::thread_rng();
+        let mut is_repeat = false;
         for i in 0..self.size {
             loop {
-                for j in 0..self.size {
-                    let rnum = rng.gen_range(1..self.size + 1);
-                    let is_repeat = self.check_repeat_gen(
-                        rnum,
+                let mut nums: Vec<usize> = (1..self.size + 1).collect();
+                nums.shuffle(&mut rng);
+                for (j, rnum) in nums.iter().enumerate() {
+                    is_repeat = self.check_repeat_gen(
+                        *rnum,
                         self.item[i][j].bx_pos,
                         self.item[i][j].by_pos,
                         i,
                         j,
                     );
-                    if !is_repeat {
-                        self.item[i][j].value = rnum;
+                    if is_repeat {
+                        break;
                     }
                 }
-                let sum_item: usize = self.item[i].iter().map(|v| v.value).sum();
-                if expect_sum == sum_item {
-                    break;
+                if is_repeat {
+                    is_repeat = false;
+                    continue;
                 }
+                for (j, rnum) in nums.iter().enumerate() {
+                    self.item[i][j].value = *rnum;
+                }
+                break;
             }
         }
     }
