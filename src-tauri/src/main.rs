@@ -94,25 +94,26 @@ fn main() {
     #[cfg(target_os = "macos")]
     let package_info = context.package_info();
 
-    let menu = Menu::new().add_submenu(
-        #[cfg(target_os = "macos")]
-        Submenu::new(
-            package_info.package_name().to_string(),
-            Menu::new()
-                .add_native_item(MenuItem::About(
-                    package_info.package_name().to_string(),
-                    AboutMetadata::default(),
-                ))
-                .add_native_item(MenuItem::Separator)
-                .add_native_item(MenuItem::Services)
-                .add_native_item(MenuItem::Separator)
-                .add_native_item(MenuItem::Hide)
-                .add_native_item(MenuItem::HideOthers)
-                .add_native_item(MenuItem::ShowAll)
-                .add_native_item(MenuItem::Separator)
-                .add_native_item(MenuItem::Quit),
-        ),
-    );
+    #[cfg(target_os = "macos")]
+    let menu = Menu::new().add_submenu(Submenu::new(
+        package_info.package_name().to_string(),
+        Menu::new()
+            .add_native_item(MenuItem::About(
+                package_info.package_name().to_string(),
+                AboutMetadata::default(),
+            ))
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::Services)
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::Hide)
+            .add_native_item(MenuItem::HideOthers)
+            .add_native_item(MenuItem::ShowAll)
+            .add_native_item(MenuItem::Separator)
+            .add_native_item(MenuItem::Quit),
+    ));
+
+    #[cfg(target_os = "windows")]
+    let menu = Menu::new();
 
     tauri::Builder::default()
         .manage(Game {
