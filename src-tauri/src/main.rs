@@ -6,8 +6,14 @@ pub mod sudoku;
 use crate::sudoku::board::*;
 use std::sync::Mutex;
 use sudoku::sun::Sun;
-use tauri::{AboutMetadata, State};
-use tauri::{Menu, MenuItem, Submenu};
+use tauri::State;
+use tauri::Menu;
+
+#[cfg(target_os = "macos")]
+use tauri::State::AboutMetadata;
+
+#[cfg(target_os = "macos")]
+use tauri::{MenuItem, Submenu};
 
 struct Game {
     board: Mutex<Option<Board>>,
@@ -84,9 +90,14 @@ fn submit_answer(game: State<Game>) -> Result<bool, ()> {
 
 fn main() {
     let context = tauri::generate_context!();
+    
+    let menu = Menu::new();
+
+    #[cfg(target_os = "macos")]
     let package_info = context.package_info();
 
-    let menu = Menu::new().add_submenu(Submenu::new(
+    #[cfg(target_os = "macos")]
+    menu.add_submenu(Submenu::new(
         package_info.package_name().to_string(),
         Menu::new()
             .add_native_item(MenuItem::About(
