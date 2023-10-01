@@ -6,11 +6,11 @@ pub mod sudoku;
 use crate::sudoku::board::*;
 use std::sync::Mutex;
 use sudoku::sun::Sun;
-use tauri::State;
 use tauri::Menu;
+use tauri::State;
 
 #[cfg(target_os = "macos")]
-use tauri::State::AboutMetadata;
+use tauri::AboutMetadata;
 
 #[cfg(target_os = "macos")]
 use tauri::{MenuItem, Submenu};
@@ -90,29 +90,29 @@ fn submit_answer(game: State<Game>) -> Result<bool, ()> {
 
 fn main() {
     let context = tauri::generate_context!();
-    
-    let menu = Menu::new();
 
     #[cfg(target_os = "macos")]
     let package_info = context.package_info();
 
-    #[cfg(target_os = "macos")]
-    menu.add_submenu(Submenu::new(
-        package_info.package_name().to_string(),
-        Menu::new()
-            .add_native_item(MenuItem::About(
-                package_info.package_name().to_string(),
-                AboutMetadata::default(),
-            ))
-            .add_native_item(MenuItem::Separator)
-            .add_native_item(MenuItem::Services)
-            .add_native_item(MenuItem::Separator)
-            .add_native_item(MenuItem::Hide)
-            .add_native_item(MenuItem::HideOthers)
-            .add_native_item(MenuItem::ShowAll)
-            .add_native_item(MenuItem::Separator)
-            .add_native_item(MenuItem::Quit),
-    ));
+    let menu = Menu::new().add_submenu(
+        #[cfg(target_os = "macos")]
+        Submenu::new(
+            package_info.package_name().to_string(),
+            Menu::new()
+                .add_native_item(MenuItem::About(
+                    package_info.package_name().to_string(),
+                    AboutMetadata::default(),
+                ))
+                .add_native_item(MenuItem::Separator)
+                .add_native_item(MenuItem::Services)
+                .add_native_item(MenuItem::Separator)
+                .add_native_item(MenuItem::Hide)
+                .add_native_item(MenuItem::HideOthers)
+                .add_native_item(MenuItem::ShowAll)
+                .add_native_item(MenuItem::Separator)
+                .add_native_item(MenuItem::Quit),
+        ),
+    );
 
     tauri::Builder::default()
         .manage(Game {
